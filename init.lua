@@ -592,6 +592,7 @@ require('lazy').setup({
         clangd = {
           filetypes = { 'c', 'cpp', 'h', 'hpp', 'objc', 'objcpp' },
         },
+        glsl_analyzer = {},
         -- gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
