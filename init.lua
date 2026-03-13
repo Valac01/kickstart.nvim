@@ -188,21 +188,80 @@ require('lazy').setup({
   --
   --
   -- Obsidian.nvim
+  --  {
+  --    'obsidian-nvim/obsidian.nvim',
+  --    version = '*', -- use latest release, remove to use latest commit
+  --    ft = 'markdown',
+  --    ---@module 'obsidian'
+  --    ---@type obsidian.config
+  --    opts = {
+  --      legacy_commands = false, -- this will be removed in the next major release
+  --      workspaces = {
+  --        {
+  --          name = 'notes',
+  --          path = '~/Documents/notes',
+  --        },
+  --      },
+  --    },
+  --  },
+
+  --  {
+  --    'folke/snacks.nvim',
+  --    opts = {
+  --      image = {
+  --        resolve = function(path, src)
+  --          local api = require 'obsidian.api'
+  --          if api.path_is_note(path) then
+  --            return api.resolve_attachment_path(src)
+  --          end
+  --        end,
+  --      },
+  --    },
+  --  },
+
+  -- zk nvim
   {
-    'obsidian-nvim/obsidian.nvim',
-    version = '*', -- use latest release, remove to use latest commit
-    ft = 'markdown',
-    ---@module 'obsidian'
-    ---@type obsidian.config
-    opts = {
-      legacy_commands = false, -- this will be removed in the next major release
-      workspaces = {
-        {
-          name = 'personal',
-          path = '~/Documents/notes/journal',
+    'zk-org/zk-nvim',
+    config = function()
+      require('zk').setup {
+        picker = 'telescope',
+
+        lsp = {
+          config = {
+            name = 'zk',
+            cmd = { 'zk', 'lsp' },
+            filetypes = { 'markdown' },
+          },
         },
-      },
-    },
+
+        auto_attach = {
+          enabled = true,
+          filetypes = { 'markdown' },
+        },
+      }
+
+      local opts = { noremap = true, silent = false }
+
+      -- Create a new note after asking for its title.
+      opts['desc'] = '[z]k [n]ew note to create'
+      vim.api.nvim_set_keymap('n', '<leader>zn', "<Cmd>ZkNew { title = vim.fn.input('Title: ') }<CR>", opts)
+
+      -- Open notes.
+      opts['desc'] = '[z]k [o]pen note'
+      vim.api.nvim_set_keymap('n', '<leader>zo', "<Cmd>ZkNotes { sort = { 'modified' } }<CR>", opts)
+
+      -- Open notes associated with the selected tags.
+      opts['desc'] = '[z]k [t]ags selected'
+      vim.api.nvim_set_keymap('n', '<leader>zt', '<Cmd>ZkTags<CR>', opts)
+
+      -- Search for the notes matching a given query.
+      opts['desc'] = '[z]k [f]ind notes'
+      vim.api.nvim_set_keymap('n', '<leader>zf', "<Cmd>ZkNotes { sort = { 'modified' }, match = { vim.fn.input('Search: ') } }<CR>", opts)
+
+      -- Search for the notes matching the current visual selection.
+      opts['desc'] = '[z]k [f]ind visually selected'
+      vim.api.nvim_set_keymap('v', '<leader>zf', ":'<,'>ZkMatch<CR>", opts)
+    end,
   },
 
   --
@@ -311,6 +370,7 @@ require('lazy').setup({
     event = 'VimEnter',
     dependencies = {
       'nvim-lua/plenary.nvim',
+
       { -- If encountering errors, see telescope-fzf-native README for installation instructions
         'nvim-telescope/telescope-fzf-native.nvim',
 
@@ -622,7 +682,7 @@ require('lazy').setup({
         clangd = {
           filetypes = { 'c', 'cpp', 'h', 'hpp', 'objc', 'objcpp' },
         },
-        glsl_analyzer = {},
+        glsl_analyzer = { 'vert', 'frag' },
         -- gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
@@ -896,7 +956,7 @@ require('lazy').setup({
     main = 'nvim-treesitter.config', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'cpp', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
